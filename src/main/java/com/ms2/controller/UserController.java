@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ms2.dto.APIResponse;
 import com.ms2.dto.LoginDto;
 import com.ms2.dto.UserDto;
+import com.ms2.service.JWTService;
 import com.ms2.serviceimpl.UserServiceimpl;
 
 import org.springframework.http.HttpStatusCode;
@@ -22,10 +23,14 @@ public class UserController {
 
 	private UserServiceimpl serviceimpl;
 	private AuthenticationManager authenticationManager;
+	private JWTService jwtService;
 
-	UserController(UserServiceimpl serviceimpl,AuthenticationManager authenticationManager) {
+	UserController(UserServiceimpl serviceimpl,
+			AuthenticationManager authenticationManager,
+			JWTService jwtService) {
 		this.serviceimpl = serviceimpl;
 		this.authenticationManager=authenticationManager;
+		this.jwtService =jwtService;
 	}
 
 	@PostMapping("/login")
@@ -39,9 +44,10 @@ public class UserController {
 		try {
 			Authentication authentication=authenticationManager.authenticate(token);
 			if(authentication.isAuthenticated()) {
+				String JwtToken=jwtService.generateToken(dto.getUsername(), authentication.getAuthorities().iterator().next().getAuthority());
 				response.setMessage("Hello "+dto.getUsername());
 				response.setStatus(200);
-				response.setData("Login Succesful");
+				response.setData(JwtToken);
 				return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getStatus()));
 			}
 		}

@@ -12,7 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.ms2.filter.JwtFilter;
 import com.ms2.service.LoginService;
 
 @Configuration
@@ -20,9 +22,10 @@ import com.ms2.service.LoginService;
 public class SecurityConfig {
 	
 	private LoginService loginService;
-	
-	public SecurityConfig(LoginService loginService) {
+	private JwtFilter jwtFilter;
+	public SecurityConfig(LoginService loginService,JwtFilter jwtFilter) {
 		this.loginService= loginService;
+		this.jwtFilter= jwtFilter;
 	}
 	
 	@Bean
@@ -48,7 +51,9 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .anyRequest()
                     .authenticated();
-        }).httpBasic(Customizer.withDefaults());
+        }).authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(Customizer.withDefaults());
 		return http.build();
 	}
 	
