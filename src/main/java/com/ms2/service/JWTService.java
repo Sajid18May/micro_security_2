@@ -1,7 +1,6 @@
 package com.ms2.service;
 
 import java.util.Date;
-
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
@@ -22,5 +21,12 @@ public class JWTService {
 				.withExpiresAt(new Date(System.currentTimeMillis()+EXPIRE_TIME))
 				.sign(Algorithm.HMAC256(SECRET_KEY));
 				
+	}
+	public String validateTokenAndGetSubject(String token) {
+		return JWT
+				.require(Algorithm.HMAC256(SECRET_KEY))
+				.build()
+				.verify(token)
+				.getSubject();
 	}
 }
