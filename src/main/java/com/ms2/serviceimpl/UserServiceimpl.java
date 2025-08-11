@@ -30,12 +30,14 @@ public class UserServiceimpl implements UserService{
 			response.setMessage("Duplicate Entry");
 			response.setStatus(409);
 			response.setData("Username already exists");
+			return response;
 		}
 		
 		if(repository.existsByEmail(dto.getEmail())) {
 			response.setMessage("Duplicate Entry");
 			response.setStatus(409);
 			response.setData("Email already exists");
+			return response;
 		}
 		User user=new User();
 		BeanUtils.copyProperties(dto, user);
